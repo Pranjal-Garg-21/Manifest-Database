@@ -182,6 +182,40 @@ def read_5_shared_calling_threats(connection):
     except pymysql.Error as e:
         print(f"Error: {e}")
 
+def read_6_passenger_event_count(connection):
+    """6. Passenger Event Involvement Count."""
+    print("\n--- 6. Passenger Event Involvement ---")
+    try:
+        with connection.cursor() as cursor:
+            sql = """
+                SELECT P.FName, P.LName, COUNT(I.Event_ID) AS Total_Events
+                FROM PASSENGER P
+                LEFT JOIN INVOLVES I ON P.Passenger_ID = I.Passenger_ID
+                GROUP BY P.Passenger_ID
+                ORDER BY Total_Events DESC
+            """
+            cursor.execute(sql)
+            format_results(cursor.fetchall())
+    except pymysql.Error as e:
+        print(f"Error: {e}")
+
+def read_7_objects_uncovered(connection):
+    """7. Objects Uncovered by Location."""
+    print("\n--- 7. Objects Uncovered by Location ---")
+    try:
+        with connection.cursor() as cursor:
+            sql = """
+                SELECT HO.Object_Name, L.Location_Name, U.Discovery_Date
+                FROM UNCOVERS U
+                JOIN HISTORICAL_OBJECT HO ON U.Object_ID = HO.Object_ID
+                JOIN LOCATION L ON U.Location_ID = L.Location_ID
+                ORDER BY U.Discovery_Date DESC
+            """
+            cursor.execute(sql)
+            format_results(cursor.fetchall())
+    except pymysql.Error as e:
+        print(f"Error: {e}")
+
 # ==============================================================================
 # --- WRITE (UPDATE) OPERATIONS ---
 # ==============================================================================
@@ -272,6 +306,9 @@ def main_cli(connection):
         print("6. Add Passenger (INSERT)")
         print("7. Update Status (UPDATE)")
         print("8. Delete Calling (DELETE)")
+        print("-----------------------------------------")
+        print("9. Passenger Event Involvement Count (READ)")
+        print("10. Objects Uncovered by Location (READ)")
         print("q. Quit")
         print("=========================================")
         
@@ -285,6 +322,8 @@ def main_cli(connection):
         elif c == '6': write_1_add_passenger(connection)
         elif c == '7': write_2_update_passenger_status(connection)
         elif c == '8': write_3_delete_calling(connection)
+        elif c == '9': read_6_passenger_event_count(connection)
+        elif c == '10': read_7_objects_uncovered(connection)
         elif c == 'q': 
             print("Exiting...")
             break

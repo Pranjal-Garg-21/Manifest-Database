@@ -90,4 +90,5 @@ Once the application starts, follow the on-screen numbered prompts:
 6. **INSERT:** Prompts the user for data to insert a new passenger
 7. **UPDATE:** Prompts the user to update the status of an existing passenger
 8. **DELETE:** Prompts the user to choose a calling ID to delete that calling entry
-
+9. **READ:** Passenger Event Involvement Count
+10. **READ:** Objects Uncovered by Location

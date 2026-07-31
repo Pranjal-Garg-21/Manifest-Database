@@ -264,3 +264,32 @@ CREATE TABLE UNCOVERS (
     FOREIGN KEY (Location_ID) REFERENCES LOCATION(Location_ID) ON DELETE CASCADE
 );
 
+-- ========================================================
+-- 7. EXAMPLE COMPLEX QUERIES
+-- ========================================================
+
+-- Query A: Rank Agency Effectiveness (JOIN, GROUP BY, Aggregate Function)
+-- This query calculates the total number of cases solved by each government agency.
+SELECT GA.Agency_Name, SUM(A.Cases_Solved) AS Total_Solved
+FROM GOVERNMENT_AGENCY GA
+JOIN GOVERNMENT_AGENT A ON GA.Agency_ID = A.Agency_ID
+GROUP BY GA.Agency_Name
+ORDER BY Total_Solved DESC;
+
+-- Query B: Shared Calling Threat Analysis (Multiple JOINs, Subquery, GROUP BY, HAVING)
+-- This query finds passengers who experienced a 'Shared Calling' and are monitored by a 'Hostile' agency.
+SELECT 
+    P.FName, P.LName, 
+    C.Description AS 'Shared Calling', 
+    GA.Agency_Name AS 'Hostile Agency'
+FROM PASSENGER P
+JOIN EXPERIENCES E ON P.Passenger_ID = E.Passenger_ID
+JOIN CALLING C ON E.Calling_ID = C.Calling_ID
+JOIN MONITORS M ON P.Passenger_ID = M.Passenger_ID
+JOIN GOVERNMENT_AGENCY GA ON M.Agency_ID = GA.Agency_ID
+WHERE E.Calling_ID IN (
+    SELECT Calling_ID FROM EXPERIENCES
+    GROUP BY Calling_ID HAVING COUNT(Passenger_ID) > 1
+) 
+AND GA.Stance = 'Hostile';
+
